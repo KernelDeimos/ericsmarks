@@ -1,10 +1,24 @@
 from PyQt4 import QtGui
 
+class SpreadsheetCell(QtGui.QLineEdit):
+    def __init__(self,text,rowid,cellid):
+        super(SpreadsheetCell, self).__init__(text)
+
 class AlmostSpreadsheet(QtGui.QWidget):
     def __init__(self):
         super(AlmostSpreadsheet, self).__init__()
-        grid = QtGui.QGridLayout()
-        self.setLayout(grid)
+        self.widgets = []
+        self.rowCount = 0
+        self.grid = QtGui.QGridLayout()
+        self.setLayout(self.grid)
+    def clear_all(self):
+        for wid in self.widgets:
+            wid.deleteLater()
+        self.widgets = []
+    def add_row(self,row):
+        for k,item in enumerate(row):
+            self.grid.addWidget(SpreadsheetCell(str(item),self.rowCount,k), self.rowCount, k)
+        self.rowCount += 1
 
 class SQLPage(QtGui.QWidget):
     def __init__(self,inst):
@@ -21,7 +35,9 @@ class SQLPage(QtGui.QWidget):
     def on_enterkey(self):
         sql = self.sqlBox.text()
         c = self.inst.haphazardly_run_statement(sql)
-        print([row for row in c])
+        rows = [row for row in c]
+        for row in rows:
+            self.sheet.add_row(row)
 
 class CommitBox(QtGui.QWidget):
     def __init__(self,inst):

@@ -29,7 +29,8 @@ class Instance():
         return self.c
     def haphazardly_run_statement(self,sql):
         res = self.c.run_sql(sql)
-        self.aw.show_commit_box()
+        if self.c.changes_since_commit() > 0:
+            self.aw.show_commit_box()
         return res
     def commit_changes(self):
         self.c.commit()
@@ -105,6 +106,7 @@ class DatabaseManager:
         self.fname = fname
         self.students = []
         self.con = None
+        self.lastChanges = 0
     def chfname(self,fname):
         self.fname = fname
     def connect(self):
@@ -125,8 +127,11 @@ class DatabaseManager:
         return res
     def commit(self):
         self.con.commit()
+        self.lastChanges = self.con.total_changes
     def rollback(self):
         self.con.rollback()
+    def changes_since_commit(self):
+        return self.con.total_changes - self.lastChanges
     def add_student(self,student):
         self.students.append(student)
 
