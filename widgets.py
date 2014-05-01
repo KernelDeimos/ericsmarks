@@ -3,6 +3,7 @@ from PyQt4 import QtGui
 class SpreadsheetCell(QtGui.QLineEdit):
     def __init__(self,text,rowid,cellid):
         super(SpreadsheetCell, self).__init__(text)
+        self.setFrame(False)
 
 class AlmostSpreadsheet(QtGui.QWidget):
     def __init__(self):
@@ -10,7 +11,12 @@ class AlmostSpreadsheet(QtGui.QWidget):
         self.widgets = []
         self.rowCount = 0
         self.grid = QtGui.QGridLayout()
+        self.grid.setVerticalSpacing(0)
+        self.grid.setHorizontalSpacing(0)
         self.setLayout(self.grid)
+        with open('./css/style.css','r') as css:
+            self.setStyleSheet(css.read())
+        #self.setStyleSheet("QLineEdit { border-right: 1px solid #777777;border-bottom: 1px solid #777777; }")
     def clear_all(self):
         for wid in self.widgets:
             wid.deleteLater()

@@ -10,16 +10,19 @@ class Instance():
         self.c = None
         app = QtGui.QApplication([])
         self.aw = AppWindow(self)
+        self.open_database("./databases/test.db")
         sys.exit(app.exec_())
     def close_it_down(self):
         if self.c != None:
             self.c.close()
-    def open_database(self,newdatabase):
+    def open_database(self,fname):
+        newdatabase = DatabaseManager(fname)
         if self.c != None:
             self.c.close()
         self.c = newdatabase
         self.c.connect()
-    def new_database(self,newdatabase):
+    def new_database(self,fname):
+        newdatabase = DatabaseManager(fname)
         if self.c != None:
             self.c.close()
         self.c = newdatabase
@@ -93,12 +96,12 @@ class AppWindow(QtGui.QMainWindow):
         self.show()
     def diag_open_database(self):
         fname = QtGui.QFileDialog.getOpenFileName(self, 'Open file', './databases', filter="Database Files (*.db)", selectedFilter='*.db')
-        self.inst.open_database(DatabaseManager(fname))
+        self.inst.open_database(fname)
     def diag_new_database(self):
         fname = QtGui.QFileDialog.getSaveFileName(self, 'New file', './databases', filter="Database Files (*.db)", selectedFilter='*.db')
         if fname[-3:] != ".db":
             fname += ".db"
-        self.inst.new_database(DatabaseManager(fname))
+        self.inst.new_database(fname)
 
 
 class DatabaseManager:
