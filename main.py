@@ -8,6 +8,7 @@ import widgets
 class Instance():
     def __init__(self):
         self.c = None
+        self.keepRunning = True
         app = QtGui.QApplication([])
         self.aw = AppWindow(self)
         self.open_database("./databases/test.db")
@@ -15,6 +16,7 @@ class Instance():
     def close_it_down(self):
         if self.c != None:
             self.c.close()
+        self.keepRunning = False
     def open_database(self,fname):
         newdatabase = DatabaseManager(fname)
         if self.c != None:
@@ -34,7 +36,7 @@ class Instance():
         res = self.c.run_sql(sql)
         if self.c.changes_since_commit() > 0:
             self.aw.show_commit_box()
-        return res
+        return self.c.get_dict(res)
     def commit_changes(self):
         self.c.commit()
     def rollback_changes(self):
@@ -128,6 +130,18 @@ class DatabaseManager:
         print(sql)
         res = self.con.execute(str(sql))
         return res
+    def get_dict(self,c):
+        finalResult = []
+        fieldNames = []
+        for field in c.description:
+            fieldNames.append(field[0])
+        rows = [row for row in c]
+        for row in rows:
+            thisRow = {}
+            for j,val in enumerate(row):
+                thisRow[fieldNames[j]] = val
+            finalResult.append(thisRow)
+        return finalResult
     def commit(self):
         self.con.commit()
         self.lastChanges = self.con.total_changes
